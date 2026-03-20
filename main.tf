@@ -38,3 +38,28 @@ provider "aws" {
     backup         = "http://localhost:4566"
   }
 }
+
+# VPC: Foundation for our secure storage lab
+resource "aws_vpc" "storage_vpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  tags = {
+    Name = "storage-vpc"
+  }
+}
+
+# Private Subnet 1: us-east-1a
+resource "aws_subnet" "storage_private_1" {
+  vpc_id            = aws_vpc.storage_vpc.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "us-east-1a"
+  tags = { Name = "storage-private-1" }
+}
+
+# Private Subnet 2: us-east-1b
+resource "aws_subnet" "storage_private_2" {
+  vpc_id            = aws_vpc.storage_vpc.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "us-east-1b"
+  tags = { Name = "storage-private-2" }
+}
