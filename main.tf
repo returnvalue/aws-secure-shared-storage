@@ -80,3 +80,14 @@ resource "aws_kms_alias" "efs_key_alias" {
   name          = "alias/efs-key"
   target_key_id = aws_kms_key.efs_key.key_id
 }
+
+# EFS File System: Encrypted shared storage
+resource "aws_efs_file_system" "shared_storage" {
+  creation_token = "my-shared-storage"
+  encrypted      = true
+  kms_key_id     = aws_kms_key.efs_key.arn
+
+  tags = {
+    Name = "secure-shared-storage"
+  }
+}
