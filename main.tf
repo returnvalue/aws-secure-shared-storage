@@ -63,3 +63,20 @@ resource "aws_subnet" "storage_private_2" {
   availability_zone = "us-east-1b"
   tags = { Name = "storage-private-2" }
 }
+
+# KMS Key: Customer Managed Key for EFS encryption
+resource "aws_kms_key" "efs_key" {
+  description             = "KMS key for EFS encryption"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+
+  tags = {
+    Name = "efs-encryption-key"
+  }
+}
+
+# KMS Alias: Easy-to-remember name for the key
+resource "aws_kms_alias" "efs_key_alias" {
+  name          = "alias/efs-key"
+  target_key_id = aws_kms_key.efs_key.key_id
+}
