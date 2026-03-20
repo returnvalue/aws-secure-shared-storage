@@ -91,3 +91,38 @@ resource "aws_efs_file_system" "shared_storage" {
     Name = "secure-shared-storage"
   }
 }
+
+# Security Group for EFS: Allows NFS traffic (port 2049)
+resource "aws_security_group" "efs_sg" {
+  name        = "efs-sg"
+  description = "Allow NFS traffic for EFS"
+  vpc_id      = aws_vpc.storage_vpc.id
+
+  ingress {
+    from_port   = 2049
+    to_port     = 2049
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.storage_vpc.cidr_block] # Allow entire VPC
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Mount Target 1: us-east-1a
+resource "aws_efs_mount_target" "mount_1" {
+  file_system_id  = aws_efs_file_system.shared_storage.id
+  subnet_id       = aws_subnet.storage_private_1.id
+  security_groups = [aws_security_group.efs_sg.id]
+}
+
+# Mount Target 2: us-east-1b
+resource "aws_efs_mount_target" "mount_2" {
+  file_system_id  = aws_efs_file_system.shared_storage.id
+  subnet_id       = aws_subnet.storage_private_2.id
+  security_groups = [aws_security_group.efs_sg.id]
+}
